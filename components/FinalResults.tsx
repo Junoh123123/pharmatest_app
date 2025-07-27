@@ -8,9 +8,10 @@ interface FinalResultsProps {
   results: QuestionResult[]
   categoryName: string
   onRestart: () => void
+  subjectId: string 
 }
 
-export function FinalResults({ results, categoryName, onRestart }: FinalResultsProps) {
+export function FinalResults({ results, categoryName, onRestart, subjectId }: FinalResultsProps) {
   const sessionScore = calculateSessionScore(results)
   
   const getScoreColor = (percentage: number) => {
@@ -156,7 +157,7 @@ export function FinalResults({ results, categoryName, onRestart }: FinalResultsP
           </button>
           
           <Link 
-            href="/"
+            href={`/${subjectId}`}
             className="
               px-8 py-4 bg-gray-100 text-gray-700 font-semibold rounded-2xl
               hover:bg-gray-200 active:bg-gray-300

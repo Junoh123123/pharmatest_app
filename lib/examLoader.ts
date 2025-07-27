@@ -1,48 +1,86 @@
+// lib/examLoader.ts (이 코드로 전체를 교체)
+
 import { promises as fs } from 'fs'
 import path from 'path'
-import { parseExamData } from './examData'
-import { ExamData } from '@/types/exam'
+import { parseSubjectData } from './examData'
+import { ExamData, Subject } from '@/types/exam'
+import { subjectsConfig } from '@/content'
 
-let cachedExamData: ExamData | null = null
+let cachedExamData: ExamData | null = null;
 
-/**
- * exam.mdファイルを読み込んでパースされたデータを返す
- */
-export async function loadExamData(): Promise<ExamData> {
+async function loadAllData(): Promise<ExamData> {
+  // 개발 환경에서는 항상 파일을 새로 읽어온다.
+  if (process.env.NODE_ENV === 'development') {
+    return await fetchAllSubjects();
+  }
+
+  // 프로덕션 환경에서는 캐시된 데이터를 사용한다.
   if (cachedExamData) {
-    return cachedExamData
+    return cachedExamData;
   }
   
-  try {
-    const filePath = path.join(process.cwd(), 'exam.md')
-    const fileContent = await fs.readFile(filePath, 'utf-8')
-    cachedExamData = parseExamData(fileContent)
-    return cachedExamData
-  } catch (error) {
-    console.error('Error loading exam data:', error)
-    // フォールバック: 空のデータを返す
-    return { categories: [] }
+  cachedExamData = await fetchAllSubjects();
+  return cachedExamData;
+}
+
+async function fetchAllSubjects(): Promise<ExamData> {
+  const subjects: Subject[] = [];
+
+  for (const config of subjectsConfig) {
+    // 각 과목의 설정 파일(config)에 명시된 id를 사용해 markdown 파일 경로를 만든다.
+    const markdownPath = path.join(process.cwd(), `content/${config.subject.id}.md`);
+    try {
+      const markdownContent = await fs.readFile(markdownPath, 'utf-8');
+      
+      // 마크다운 내용과 해당 과목의 설정을 함께 파서에 넘겨준다.
+      const subjectData = parseSubjectData(
+        markdownContent,
+        config.subject,
+        config.categories
+      );
+      subjects.push(subjectData);
+    } catch (error) {
+      console.error(`Error loading or parsing ${config.subject.id}.md:`, error);
+    }
   }
+  
+  return { subjects };
 }
 
-/**
- * 特定のカテゴリのデータを取得
- */
+// --- 아래 함수들은 그대로 두면 된다. 내부적으로 새로운 loadAllData를 사용하게 된다. ---
+
+export async function getAllSubjects() {
+  const examData = await loadAllData();
+  return examData.subjects.map(subject => ({
+    id: subject.id,
+    name: subject.name,
+    description: subject.description,
+    categoryCount: subject.categories.length
+  }));
+}
+
+export async function getSubjectData(subjectId: string) {
+  const examData = await loadAllData();
+  return examData.subjects.find(s => s.id === subjectId) || null;
+}
+
 export async function getCategoryData(categoryId: string) {
-  const examData = await loadExamData()
-  return examData.categories.find(category => category.id === categoryId)
+  const examData = await loadAllData();
+  for (const subject of examData.subjects) {
+    const category = subject.categories.find(c => c.id === categoryId);
+    if (category) {
+      return category;
+    }
+  }
+  return null;
 }
 
-/**
- * 全カテゴリのリストを取得
- */
-export async function getAllCategories() {
-  const examData = await loadExamData()
-  return examData.categories.map(category => ({
-    id: category.id,
-    name: category.name,
-    nameEn: category.nameEn,
-    description: category.description,
-    questionCount: category.questionCount
-  }))
-} 
+export async function getAllSubjectCategoryPaths() {
+  const examData = await loadAllData();
+  return examData.subjects.flatMap(subject => 
+    subject.categories.map(category => ({
+      subject: subject.id,
+      category: category.id
+    }))
+  );
+}

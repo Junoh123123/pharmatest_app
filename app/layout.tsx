@@ -1,21 +1,16 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { siteConfig } from '@/lib/siteConfig' // 👈 불러오기
 
 export const metadata: Metadata = {
-  title: '薬学部定期試験学習アプリ',
-  description: '定期試験の虫食い問題を効率的に学習できるインタラクティブなWebアプリケーション',
+  title: siteConfig.title, // 👈 변수로 변경
+  description: siteConfig.description, // 👈 변수로 변경
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <body className="antialiased">
-        {children}
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   )
 }
