@@ -142,6 +142,14 @@ interface Category {
    - 回答を送信して正誤を確認
    - 全問題完了後に結果を表示
 
+   ---
+
+## クレジット (Credits)
+
+このアプリケーションの元となるアイデアとコードは [@hibiki1213](https://github.com/hibiki1213) によって作成されました。
+
+* **Original Repository**: [https://github.com/hibiki1213/examapp]
+
 ## ライセンス
 
 MIT License
