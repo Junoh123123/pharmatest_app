@@ -14,7 +14,7 @@ export function CategoryCard({ id, name, nameEn, description, questionCount }: C
   return (
     <Link 
       href={`/${id}`}
-      className="group block w-full max-w-md mx-auto"
+      className="group block w-full max-w-md mx-auto h-full"
     >
       <div className="
         relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-xl
@@ -22,9 +22,10 @@ export function CategoryCard({ id, name, nameEn, description, questionCount }: C
         transition-all duration-300 ease-out
         hover:scale-[1.02] hover:border-gray-300/50
         active:scale-[0.98] active:transition-none
+        h-full flex flex-col
       ">
         {/* カードコンテンツ */}
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-grow">
           {/* ヘッダー */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
@@ -60,12 +61,12 @@ export function CategoryCard({ id, name, nameEn, description, questionCount }: C
           </div>
 
           {/* 説明文 */}
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">
+          <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow">
             {description}
           </p>
 
           {/* 問題数 */}
-          <div className="flex items-center text-sm">
+          <div className="flex items-center text-sm mt-auto">
             <svg 
               className="w-4 h-4 text-gray-400 mr-2" 
               fill="none" 
@@ -94,4 +95,4 @@ export function CategoryCard({ id, name, nameEn, description, questionCount }: C
       </div>
     </Link>
   )
-} 
+}
