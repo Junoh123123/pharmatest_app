@@ -280,5 +280,5 @@ export function QuestionCard({
   }
 
   // 지원되지 않는 문제 타입
-  return <div>Unsupported question type: {(question as any).type}</div>
+  return <div>Unsupported question type: {(question as { type: string }).type}</div>
 }
