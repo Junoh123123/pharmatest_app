@@ -1,14 +1,17 @@
 // lib/examData.ts (이 코드로 전체를 교체)
 
-import type { Category, Question, BlankField, Subject, FillInTheBlankQuestion, OXQuestion } from '@/types/exam'
+import type { Category, Question, BlankField, Subject, FillInTheBlankQuestion } from '@/types/exam'
 
 type CategoryMapping = {
-  [key:string]: {
+  [key: string]: {
     id: string;
+    name: string; // Added to align with Category
     nameEn: string;
     description: string;
     start: number;
     end: number;
+    questionCount: number; // Made mandatory
+    questions: Question[]; // Made mandatory
   };
 };
 
@@ -26,20 +29,20 @@ export function parseSubjectData(
   categoryConfig: CategoryMapping
 ): Subject {
   const lines = markdownContent.split('\n');
-  
-  const problemSectionEnd = lines.findIndex(line => line.includes('### 回答集'));
+
+  const problemSectionEnd = lines.findIndex((line) => line.includes('### 回答集'));
   const problemLines = lines.slice(0, problemSectionEnd);
   const answerLines = lines.slice(problemSectionEnd);
 
   const problemsByCategory = parseProblemsSection(problemLines, categoryConfig);
   const answersByCategory = parseAnswersSection(answerLines, categoryConfig);
-  
-  const categories: Category[] = Object.keys(problemsByCategory).map(categoryName => {
+
+  const categories: Category[] = Object.keys(problemsByCategory).map((categoryName) => {
     const mapping = categoryConfig[categoryName.trim()];
     const questions = problemsByCategory[categoryName];
     const answers = answersByCategory[categoryName] || {};
 
-    questions.forEach(question => {
+    questions.forEach((question) => {
       if (question.type === 'fill-in-the-blank' && 'absoluteNumber' in question) {
         const originalQuestionNumber = (question as FillInTheBlankQuestion & { absoluteNumber: number }).absoluteNumber;
         question.blanks.forEach((blank, index) => {
@@ -50,24 +53,22 @@ export function parseSubjectData(
         });
       }
     });
-    
-    // ✅ 카테고리의 범위에 따라 문제 필터링
-    // 질문들을 인덱스 기반으로 처리
+
     const questionsWithRelativeNumbers = questions.map((question, index) => ({
       ...question,
       absoluteNumber: parseInt(question.id.split('-').pop() || '0'),
-      id: `${mapping.id}-${index + 1}` // 카테고리 내에서의 상대적 번호로 ID 재설정
+      id: `${mapping.id}-${index + 1}`,
     }));
 
     return {
       id: mapping.id,
-      name: categoryName.trim(),
+      name: mapping.name.trim(),
       nameEn: mapping.nameEn.trim(),
       description: mapping.description.trim(),
       start: mapping.start,
       end: mapping.end,
       questionCount: questions.length,
-      questions: questionsWithRelativeNumbers
+      questions: questionsWithRelativeNumbers,
     };
   });
 
@@ -134,7 +135,7 @@ function parseProblemsSection(lines: string[], categoryConfig: CategoryMapping):
   return result;
 }
 
-function parseAnswersSection(lines: string[], categoryConfig: CategoryMapping): { [category: string]: { [questionNumber: number]: string[] } } {
+function parseAnswersSection(lines: string[], categoryConfig: { [key: string]: Category }): { [category: string]: { [questionNumber: number]: string[] } } {
   const result: { [category: string]: { [questionNumber: number]: string[] } } = {};
   let currentCategory: string | null = null;
   let currentQuestionNumber: number | null = null;
@@ -146,35 +147,32 @@ function parseAnswersSection(lines: string[], categoryConfig: CategoryMapping): 
 
     const categoryMatch = trimmedLine.match(/^####\s+(.+?)(?:\s+\(.+\))?$/);
     if (categoryMatch) {
-        const potentialCategoryName = categoryMatch[1].trim();
-        if(categoryConfig[potentialCategoryName]) {
-          if (currentCategory && currentQuestionNumber !== null && currentAnswers.length > 0) {
-            if (!result[currentCategory]) result[currentCategory] = {};
-            result[currentCategory][currentQuestionNumber] = currentAnswers;
-          }
-          currentCategory = potentialCategoryName;
-          result[currentCategory] = {};
-          currentQuestionNumber = null;
-          currentAnswers = [];
-          continue;
+      const potentialCategoryName = categoryMatch[1].trim();
+      if (categoryConfig[potentialCategoryName]) {
+        if (currentCategory && currentQuestionNumber !== null && currentAnswers.length > 0) {
+          if (!result[currentCategory]) result[currentCategory] = {};
+          result[currentCategory][currentQuestionNumber] = currentAnswers;
         }
+        currentCategory = potentialCategoryName;
+        result[currentCategory] = {};
+        currentQuestionNumber = null;
+        currentAnswers = [];
+        continue;
+      }
     }
 
     if (currentCategory) {
-        // 새로운 답안 라인을 발견하면
-        const questionMatch = trimmedLine.match(/^(\d+)\.\s+(.+)/);
-        if (questionMatch) {
-            // 현재 처리 중인 답안이 있다면 먼저 저장
-            if (currentQuestionNumber !== null && currentAnswers.length > 0) {
-                if (!result[currentCategory]) result[currentCategory] = {};
-                result[currentCategory][currentQuestionNumber] = currentAnswers;
-            }
-            
-            // 새로운 답안 처리 시작
-            currentQuestionNumber = parseInt(questionMatch[1]);
-            const answerText = questionMatch[2];
-            currentAnswers = answerText.includes('該当なし') ? [] : extractAnswersFromText(answerText);
+      const questionMatch = trimmedLine.match(/^(\d+)\.\s+(.+)/);
+      if (questionMatch) {
+        if (currentQuestionNumber !== null && currentAnswers.length > 0) {
+          if (!result[currentCategory]) result[currentCategory] = {};
+          result[currentCategory][currentQuestionNumber] = currentAnswers;
         }
+
+        currentQuestionNumber = parseInt(questionMatch[1]);
+        const answerText = questionMatch[2];
+        currentAnswers = answerText.includes('該当なし') ? [] : extractAnswersFromText(answerText);
+      }
     }
   }
 
@@ -182,7 +180,7 @@ function parseAnswersSection(lines: string[], categoryConfig: CategoryMapping): 
     if (!result[currentCategory]) result[currentCategory] = {};
     result[currentCategory][currentQuestionNumber] = currentAnswers;
   }
-  
+
   return result;
 }
 
@@ -220,11 +218,11 @@ function createQuestion(relativeNumber: number, originalNumber: number, category
 }
 
 function extractAnswersFromText(text: string): string[] {
-    const boldAnswers = text.match(/\*\*([^*]+)\*\*/g);
-    if (boldAnswers) {
-        return boldAnswers.map(answer => answer.replace(/\*\*/g, '').trim());
-    }
-    return [];
+  const boldAnswers = text.match(/\*\*([^*]+)\*\*/g);
+  if (boldAnswers) {
+    return boldAnswers.map((answer) => answer.replace(/\*\*/g, '').trim());
+  }
+  return [];
 }
 
 // ========================================================================

@@ -155,7 +155,7 @@ export default function CategoryPage() {
               </svg>
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">
-              {category.name.trim()}
+              {(category.name || category.nameEn).trim()}
             </h1>
           </div>
         </div>

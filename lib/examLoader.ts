@@ -36,10 +36,22 @@ async function fetchAllSubjects(): Promise<ExamData> {
           config.subject as Subject 
         );
       } else {
+        const transformedCategories = Object.fromEntries(
+          Object.entries(config.categories).map(([key, value]) => [
+            key,
+            {
+              ...value,
+              name: ('name' in value ? value.name : value.nameEn) as string, // Explicitly cast to string
+              questionCount: 0, // Default to 0
+              questions: [], // Default to an empty array
+            },
+          ])
+        );
+
         subjectData = parseSubjectData(
           markdownContent,
           config.subject,
-          config.categories
+          transformedCategories
         );
       }
       
