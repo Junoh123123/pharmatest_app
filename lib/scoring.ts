@@ -30,7 +30,7 @@ export function scoreQuestion(
     const totalBlanks = question.blanks.length;
     const correctAnswers: string[] = [];
     const userAnswerTexts: string[] = [];
-    const options = (question as any).options || [];
+    const options = (question as { options?: string[] }).options || [];
     for (let i = 0; i < question.blanks.length; i++) {
       const blank = question.blanks[i];
       const userAnswer = questionAnswers.find(answer => answer.blankId === blank.id);
@@ -84,20 +84,18 @@ export function scoreQuestion(
       score: isCorrect ? 1 : 0,
       maxScore: 1
     }
-  }
+  }
 
-  // fallback (정의되지 않은 타입)
-  return {
-    questionId: (question as any).id,
-    isCorrect: false,
-    correctAnswers: [],
-    userAnswers: [],
-    score: 0,
-    maxScore: 1
-  }
-}
-
-/**
+  // fallback (정의되지 않은 타입)
+  return {
+    questionId: (question as { id: string }).id,
+    isCorrect: false,
+    correctAnswers: [],
+    userAnswers: [],
+    score: 0,
+    maxScore: 1
+  }
+}/**
  * セッション全体の採点
  */
 export function calculateSessionScore(results: QuestionResult[]) {

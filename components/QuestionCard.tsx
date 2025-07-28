@@ -26,12 +26,12 @@ export function QuestionCard({
   onSubmit,
   isSubmitted,
 }: QuestionCardProps) {
+  const [blankAnswers, setBlankAnswers] = useState<{ [blankId: string]: string }>({});
+  const [oxAnswer, setOxAnswer] = useState<string>('');
+
   if (!question) {
     return <div>Loading...</div>; // Ensure question is defined before rendering
   }
-
-  const [blankAnswers, setBlankAnswers] = useState<{ [blankId: string]: string }>({});
-  const [oxAnswer, setOxAnswer] = useState<string>('');
 
   useEffect(() => {
     if (question.type === 'fill-in-the-blank') {
@@ -64,7 +64,7 @@ export function QuestionCard({
       );
 
       (question as FillInTheBlankQuestion).blanks.forEach((blank) => {
-        let answerValue = newAnswers[blank.id];
+        const answerValue = newAnswers[blank.id];
         if (answerValue) {
           updatedUserAnswers = updatedUserAnswers.filter(
             (ua) => !(ua.questionId === question.id && ua.blankId === blank.id)

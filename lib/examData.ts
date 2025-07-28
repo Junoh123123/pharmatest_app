@@ -240,14 +240,12 @@ export function parseChoiceQuizData(
     // 헤더를 한 줄씩 직접 찾아서 비교
     const lines = markdownContent.split(/\r?\n/);
     let match = null;
-    let matchIdx = -1;
     for (let i = 0, acc = 0; i < lines.length; i++) {
       const line = lines[i];
       if (line.match(/^#{1,3}/)) {
         const headerText = normalize(line.replace(/^#{1,3}/, ''));
         if (headerText.startsWith(normalizedCatName)) {
           match = { 0: line, index: acc };
-          matchIdx = acc;
           break;
         }
       }
