@@ -295,7 +295,9 @@ export function parseChoiceQuizData(
       let text = '';
       const textMatch = block.match(/##.*\n([\s\S]*?)(?=###\s*OPTIONS|###\s*ANSWER)/i);
       if (textMatch) {
-        text = textMatch[1];
+        text = textMatch[1]
+          .replace(/TYPE:\s*(ox|multiple-choice)/i, '') // TYPE 라인 제거
+          .trim();
       } else {
         // '##'가 없는 경우, TYPE/OPTIONS/ANSWER 등 메타데이터를 제거하고 남은 부분을 텍스트로 사용
         text = block
