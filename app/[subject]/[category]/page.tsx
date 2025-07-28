@@ -167,7 +167,7 @@ export default function CategoryPage() {
         ) : (
           <QuestionCard
             question={currentQuestion}
-            questionNumber={session.currentQuestionIndex} // 0-based index 사용
+            questionNumber={session.currentQuestionIndex + 1} // 1-based index 사용
             totalQuestions={category.questions.length}
             userAnswers={session.answers}
             onAnswersChange={handleAnswersChange}
