@@ -40,6 +40,10 @@ export function QuestionCard({
     return oxUserAnswer ? oxUserAnswer.answer : ''
   })
 
+  // 각 장의 첫 번째 문제인지 확인 (안내 메시지 표시용)
+  const chapterFirstQuestions = [1, 10, 28, 46, 83, 107, 134, 148, 193, 235, 296]
+  const isChapterFirstQuestion = chapterFirstQuestions.includes(questionNumber)
+
   const handleInputChange = useCallback((blankId: string, value: string) => {
     if (!question || question.type !== 'fill-in-the-blank') return
     
@@ -253,6 +257,24 @@ export function QuestionCard({
               }
             })}
           </div>
+
+          {/* 히라가나 입력 안내 - 각 장의 첫 번째 문제에만 표시 */}
+          {isChapterFirstQuestion && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <span className="text-yellow-600 text-lg">💡</span>
+                <div className="text-sm text-yellow-800">
+                  <div className="font-medium mb-2">入力のヒント：</div>
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li><strong>漢字は ひらがな で入力しても正解です</strong></li>
+                    <li>カタカナと漢字が混在する答えは、<strong>全部ひらがなで入力</strong>すると確実です</li>
+                    <li>一部だけカタカナで入力すると認識されない場合があります</li>
+                    <li><strong>アルファベットは必ずアルファベットで入力</strong>してください</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 회답 버튼 */}
           {!isSubmitted && (
