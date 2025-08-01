@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { UserAnswer, QuestionResult, ExamSession, Category } from '@/types/exam'
@@ -19,6 +19,38 @@ export default function CategoryPage() {
   const [currentResult, setCurrentResult] = useState<QuestionResult | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // 배열을 랜덤하게 섞는 함수 (Fisher-Yates 셔플 알고리즘)
+  const shuffleArray = useCallback(<T,>(array: T[]): T[] => {
+    const shuffled = [...array] // 원본 배열을 복사
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }, [])
+
+  const initializeSession = useCallback((categoryData: Category) => {
+    // 문제 배열을 랜덤하게 섞기
+    const shuffledQuestions = shuffleArray(categoryData.questions)
+    
+    // 카테고리 데이터를 업데이트하여 섞인 문제 배열 적용
+    const shuffledCategory: Category = {
+      ...categoryData,
+      questions: shuffledQuestions
+    }
+    setCategory(shuffledCategory)
+    
+    const newSession: ExamSession = {
+      categoryId: categoryData.id,
+      currentQuestionIndex: 0,
+      answers: [],
+      results: [],
+      startTime: new Date(),
+      isCompleted: false,
+    }
+    setSession(newSession)
+  }, [shuffleArray])
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -60,39 +92,7 @@ export default function CategoryPage() {
     if (categoryId) {
       fetchCategoryData()
     }
-  }, [categoryId])
-
-  // 배열을 랜덤하게 섞는 함수 (Fisher-Yates 셔플 알고리즘)
-  const shuffleArray = (array: any[]) => {
-    const shuffled = [...array] // 원본 배열을 복사
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-    }
-    return shuffled
-  }
-
-  const initializeSession = (categoryData: Category) => {
-    // 문제 배열을 랜덤하게 섞기
-    const shuffledQuestions = shuffleArray(categoryData.questions)
-    
-    // 카테고리 데이터를 업데이트하여 섞인 문제 배열 적용
-    const shuffledCategory = {
-      ...categoryData,
-      questions: shuffledQuestions
-    }
-    setCategory(shuffledCategory)
-    
-    const newSession: ExamSession = {
-      categoryId: categoryData.id,
-      currentQuestionIndex: 0,
-      answers: [],
-      results: [],
-      startTime: new Date(),
-      isCompleted: false,
-    }
-    setSession(newSession)
-  }
+  }, [categoryId, initializeSession])
 
   const handleAnswersChange = (answers: UserAnswer[]) => {
     if (!session) return
