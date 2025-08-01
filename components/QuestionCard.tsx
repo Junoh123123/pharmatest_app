@@ -266,10 +266,7 @@ export function QuestionCard({
                 <div className="text-sm text-yellow-800">
                   <div className="font-medium mb-2">入力のヒント：</div>
                   <ul className="space-y-1 list-disc list-inside">
-                    <li><strong>漢字は ひらがな で入力しても正解です</strong></li>
-                    <li>カタカナと漢字が混在する答えは、<strong>全部ひらがなで入力</strong>すると確実です</li>
-                    <li>一部だけカタカナで入力すると認識されない場合があります</li>
-                    <li><strong>アルファベットは必ずアルファベットで入力</strong>してください</li>
+                    <li><strong>カタカナまたは漢字の医薬品名をひらがなで入力しても正解として認定されます</strong></li>
                   </ul>
                 </div>
               </div>

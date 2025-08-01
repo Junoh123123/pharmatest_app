@@ -92,7 +92,7 @@ function parseProblemsSection(lines: string[], categoryConfig: CategoryMapping):
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    const categoryMatch = trimmedLine.match(/^####\s+(.+?)(?:\s+\(.+\))?$/);
+    const categoryMatch = trimmedLine.match(/^####\s+(.+)$/);
     if (categoryMatch) {
       const potentialCategoryName = categoryMatch[1].trim();
       if (categoryConfig[potentialCategoryName]) {
@@ -145,7 +145,7 @@ function parseAnswersSection(lines: string[], categoryConfig: { [key: string]: C
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    const categoryMatch = trimmedLine.match(/^####\s+(.+?)(?:\s+\(.+\))?$/);
+    const categoryMatch = trimmedLine.match(/^####\s+(.+)$/);
     if (categoryMatch) {
       const potentialCategoryName = categoryMatch[1].trim();
       if (categoryConfig[potentialCategoryName]) {
