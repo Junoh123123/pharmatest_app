@@ -1,7 +1,8 @@
 export const subject = {
   id: 'microbiology',
   name: '微生物学',
-  description: '細菌、ウイルス、真菌などの微生物の性質や、それらが引き起こす感染症について学びます。'
+  description: '細菌、ウイルス、真菌などの微生物の性質や、それらが引き起こす感染症について学びます。',
+  isActive: false
 };
 
 export const categories = {

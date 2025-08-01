@@ -60,6 +60,7 @@ export interface Subject {
   id: string;
   name: string;
   description: string;
+  isActive?: boolean;
   categories: Category[];
 }
 
@@ -80,6 +81,7 @@ export interface Subject {
   id: string;
   name: string;
   description: string;
+  isActive?: boolean;
   categories: Category[];
 }
 

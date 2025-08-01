@@ -1,7 +1,8 @@
 export const subject = {
   id: 'analytical-chemistry',
   name: '分析化学',
-  description: '機器を用いた分析法の原理を理解し、医薬品の確認、純度試験、定量法に応用する知識を学びます。'
+  description: '機器を用いた分析法の原理を理解し、医薬品の確認、純度試験、定量法に応用する知識を学びます。',
+  isActive: false
 }
 
 export const categories = {

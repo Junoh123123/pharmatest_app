@@ -4,6 +4,7 @@ const subjectData: Subject = {
   id: 'bioethics',
   name: '生命倫理',
   description: '生命倫理、関連法規、医療現場でのコミュニケーションに関する知識を問う問題集。',
+  isActive: false,
   categories: [
     {
       id: 'bioethics-ox',

@@ -8,4 +8,4 @@ export const subjectsConfig = [
   microbiology,
   analyticalChemistry,
   bioethics,
-]
+].filter(subject => subject.subject.isActive !== false)
